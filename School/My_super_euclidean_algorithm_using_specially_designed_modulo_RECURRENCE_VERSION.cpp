@@ -6,22 +6,22 @@ using namespace std;
 int modulo(int a, int b)
 {
     int integer = 0;
-    int reszta = 0;
+    int rest = 0;
     while(true)
     {
         int multiplied = 0;
         for(int i = 0; i <= integer; i++)
             multiplied += b;
 
-        int nowareszta = a - multiplied;
-        if(reszta == nowareszta || nowareszta < 0)
+        int newRest = a - multiplied;
+        if(rest == newRest || newRest < 0)
             break;
 
-        reszta = nowareszta;
+        rest = newRest;
         integer++;
     }
-    if(reszta == a)
-        reszta = 0;
+    if(rest == a)
+        return 0;
     return reszta;
 }
 
@@ -32,6 +32,7 @@ int euclideanAlgorithm(int a, int b)
     else
         return a;
 }
+    
 int main()
 {
     int a, b; cin >> a >> b;
