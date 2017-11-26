@@ -6,14 +6,18 @@
 
 using namespace std;
 /*
-7 7
+8 11
 1 2 1
 2 3 2
-3 4 1
-4 5 1
-4 7 5
+2 4 4
+3 5 1
+3 4 2
+3 6 1
+4 8 8
 5 6 1
-6 7 1
+6 7 6
+7 8 10
+7 4 3
 */
 int main()
 {
@@ -21,45 +25,51 @@ int main()
     int nodes; cin >> nodes;
     int edges; cin >> edges;
 
-    vector<pair<int, vector<int>> > Graph(nodes + 1);
+    vector<vector<pair<int, int> > > Graph(nodes + 1);
     for(int i = 0; i < edges; i++)
     {
-        int a, b, c;
-        cin >> a >> b >> c;
-        Graph[a].first = c;
-        Graph[a].second.push_back(b);
+        int nodeA, nodeB, cost;
+        cin >> nodeA >> nodeB >> cost;
+        Graph[nodeA].push_back(make_pair(nodeB, cost));
+        //cout << "pushing " << nodeA << " " << nodeB << " " << cost << "\n";
     }
 
-    int startNode = 1;
+    cout << "[start node]: ";
+    int startNode; cin >> startNode;
     vector<int> distanceFromSource(nodes + 1, -1);
+    priority_queue<pair<int, int>, vector<pair<int, int> >, greater<pair<int, int> > > theOrder;
     distanceFromSource[startNode] = 0;
-    priority_queue<pair<int, int> > priority;
     for(int i = 1; i <= nodes; i++)
-    {
         if(i == startNode)
-            priority.push(make_pair(startNode, 0));
+            theOrder.push(make_pair(0, startNode));
         else
-            priority.push(make_pair(i, -1));
-    }
-    while(!priority.empty())
+            theOrder.push(make_pair(-1, i));
+
+    while(!theOrder.empty())
     {
-        pair<int, int> currentPair = priority.top();
-        int currentNode = currentPair.first; //node's number
-        int currentNodeDistance = currentPair.second * (-1);
-        cout << "Current node " << currentNode << "\n";
-        priority.pop();
-        for(int i = 0; i < Graph[currentNode].second.size(); i++) //loop through all neighbors
+        pair<int, int> parentPair = theOrder.top(); //first is the cost, second is the node
+        int parentNode = parentPair.second;
+        int parentCost = parentPair.first;
+        cout << "Current node " << parentNode << " with cost " << parentCost << "\n";
+        theOrder.pop();
+        for(int i = 0; i < Graph[parentNode].size(); i++)
         {
-            int currentNeighbor = Graph[currentNode].second[i];
-            int newDistance = distanceFromSource[currentNode] + currentNodeDistance;
-            if(currentNodeDistance < distanceFromSource[currentNeighbor])
+            pair<int, int> childPair = Graph[parentNode][i]; //first is the node, second is the cost
+            int newDistance = distanceFromSource[parentNode] + childPair.second; //parent node + cost to child from parent
+            cout << "Child " << childPair.first << " its cost: " << childPair.second;
+            if(childPair.second > newDistance || childPair.second == -1) //if the path is cheaper
             {
-                distanceFromSource[currentNeighbor] = newDistance;
-                currentPair.first = newDistance * (-1);
-                priority.push(currentPair);
-                cout << "TEST13\n";
+                cout << "Deal! ";
+                distanceFromSource[childPair.first] = newDistance;
+                childPair.second = newDistance;
+                theOrder.push(childPair);
             }
+            cout << "\n";
         }
     }
+
+    for(int i = 1; i <= nodes; i++)
+        cout << "Cost to " << i << " is " << distanceFromSource[i] << "\n";
+
     return 0;
 }
