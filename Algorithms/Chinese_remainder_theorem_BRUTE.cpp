@@ -4,6 +4,7 @@
 
 using namespace std;
 
+//Chinskie twierdzenie o resztach - wersja brute
 struct Congruence
 {
     int divider;
@@ -16,17 +17,21 @@ Congruence Calculate(Congruence &congA, Congruence &congB)
     int i = 0;
     int a = congA.remainder + (congA.divider * i);
     int b = congB.remainder + (congB.divider * i);
+    i++;
     while (a != b)
     {
-        i++;
+        int oldA = a;
+        int oldB = b;
         if(a > b)
-        {
             b = congB.remainder + (congB.divider * i);
-        }
         else
-        {
             a = congA.remainder + (congA.divider * i);
-        }
+
+        if (b == oldB)
+            if(a > b)
+                b = congB.remainder + (congB.divider * i);
+
+        i++;
     }
     congC.remainder = a;
     congC.divider = congA.divider * congB.divider;
@@ -35,10 +40,14 @@ Congruence Calculate(Congruence &congA, Congruence &congB)
 
 int main()
 {
-    //ios_base::sync_with_stdio(false);
-    //cin.tie(NULL);
     cout << "Operations: ";
     int operations; cin >> operations;
+    if(operations < 2)
+    {
+        cout << "Too few operations.";
+        return 0;
+    }
+
     vector<Congruence> Congruences (operations);
     for(int i = 0; i < operations; i++)
     {
@@ -52,8 +61,8 @@ int main()
     {
         Congruence congA = Congruences[i];
         Congruence congB = Congruences[i+1];
-        Congruence congC = Calculate(congA, congB);
-        cout << "x --- " << congC.remainder << " (mod " << congC.divider << ")";
+        Congruences[i+1] = Calculate(congA, congB);
     }
+    cout << "x === " << Congruences[operations - 1].remainder << " (mod " << Congruences[operations - 1].divider << ")";
     return 0;
 }
