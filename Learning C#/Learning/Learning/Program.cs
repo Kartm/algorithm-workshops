@@ -6,41 +6,27 @@ using System.Threading.Tasks;
 
 namespace Learning
 {
-    public interface ITest
+    public class Game
     {
-        void TestRequiredMethod();
-    }
-
-    public class Part
-    {
-        public Part()
+        public virtual void Menu()
         {
-
-        }
-        public void TestMethod()
-        {
-            Console.WriteLine("TestMethod");
+            Console.WriteLine("Default menu");
         }
     }
 
-    public class PartBig:Part, ITest
+    public class TicTacToe:Game
     {
-        public PartBig()
+        public override void Menu()
         {
-
-        }
-
-        public void TestRequiredMethod()
-        {
-            Console.WriteLine("Required method");
+            Console.WriteLine("Tic tac toe menu");
         }
     }
     class Program
     {
         static void Main(string[] args)
         {
-            PartBig test = new PartBig();
-            test.TestMethod();
+            TicTacToe test = new TicTacToe();
+            test.Menu();
         }
     }
 }
