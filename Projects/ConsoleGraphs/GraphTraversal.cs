@@ -6,7 +6,7 @@ namespace ConsoleGraphs
 {
     public class GraphTraversal
     {
-        protected Graph graph = new Graph(0, 0);
+        protected Graph graph;
         protected int nodeAmount;
         protected List<bool> visited = new List<bool>();
 
@@ -26,15 +26,15 @@ namespace ConsoleGraphs
         }
 
         #region DFS
-        public void RecursiveDFSLogic(int startNode)
+        private void RecursiveDFSLogic(int startNode)
         {
             visited[startNode] = true;
             Console.WriteLine("Current node {0}", startNode);
             foreach (var item in graph.GetNeighbors(startNode))
             {
-                if (visited[item.nodeB] == false)
+                if (visited[item.Node] == false)
                 {
-                    RecursiveDFSLogic(item.nodeB);
+                    RecursiveDFSLogic(item.Node);
                 }
             }
         }
@@ -48,13 +48,13 @@ namespace ConsoleGraphs
         #endregion
 
         #region Dijkstra
-        class Node
+        private class Node
         {
             public int NodeId { get; set; }
             public int Distance { get; set; }
         }
 
-        class Container
+        private class Container
         {
             private List<Node> elements = new List<Node>();
 
@@ -80,7 +80,7 @@ namespace ConsoleGraphs
 
         }
 
-        public void DijkstraLogic(int startNode, int endNode)
+        private void DijkstraLogic(int startNode, int endNode)
         {
             Container queue = new Container();
             int[] distances = new int[graph.NodeAmount + 1];
@@ -107,14 +107,14 @@ namespace ConsoleGraphs
                     visited[currentNode] = true;
                     foreach (Graph.Connection connection in graph.GetGraph()[currentNode])
                     {
-                        int currentNeighbor = connection.nodeB;
-                        int newDistance = distances[currentNode] + connection.cost;
+                        int currentNeighbor = connection.Node;
+                        int newDistance = distances[currentNode] + connection.Cost;
                         if(distances[currentNeighbor] > newDistance)
                         {
                             distances[currentNeighbor] = newDistance;
                         }
 
-                        Console.WriteLine("{0}: {1}", currentNode, connection.nodeB);
+                        Console.WriteLine("{0}: {1}", currentNode, connection.Cost);
                     }
                 }
             }
@@ -126,6 +126,119 @@ namespace ConsoleGraphs
             ResetVisited();
             DijkstraLogic(startNode, endNode);
 
+        }
+        #endregion
+
+        #region CycleCheck
+
+        //todo Here
+        /*
+        private bool IsPointingToAncestor(int node, int ancestor)
+        {
+            foreach (var item in graph.GetNeighbors(node))
+            {
+                if (item.Node == ancestor)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        
+        private bool CycleCheckDirected(int currentNode)
+        {
+            visited[currentNode] = true;
+            Console.WriteLine("Current node {0}", currentNode);
+            foreach (var item in graph.GetNeighbors(currentNode))
+            {
+                if (visited[item.node] == false)
+                {
+                    RecursiveDFSLogic(item.node);
+                    if (item.node == currentNode || IsPointingToAncestor(item.node, currentNode))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }*/
+
+        private bool CycleCheckUndirected(int startNode)
+        {
+            visited[startNode] = true;
+            Console.WriteLine("Current node {0}", startNode);
+            foreach (var item in graph.GetNeighbors(startNode))
+            {
+                if (visited[item.Node] == false)
+                {
+                    RecursiveDFSLogic(item.Node);
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool CycleCheckLogic(int startNode, bool isDirected = false)
+        {
+            if(isDirected)
+            {
+                return false;
+                //return CycleCheckDirected(startNode);
+            }
+            else
+            {
+                return CycleCheckUndirected(startNode);
+            }
+        }
+
+        public void CycleCheck(int startNode, bool isDirected)
+        {
+            ResetVisited();
+            Console.WriteLine("Is cycle: {0}", CycleCheckLogic(startNode, isDirected));
+        }
+
+        #endregion
+
+        #region Bipartite
+        private List<int> colors = new List<int>(); //! two-colouring the nodes
+
+        private bool CheckBipartiteLogic(int currentNode)
+        {
+            visited[currentNode] = true;
+            Console.WriteLine("Current node {0}", currentNode);
+            foreach (var item in graph.GetNeighbors(currentNode))
+            {
+                if (visited[item.Node] == false)
+                {
+                    //check the adjacent colors
+                    foreach (var item2 in graph.GetNeighbors(item.Node))
+                    {
+                        if(colors[currentNode] == colors[item2.Node])
+                        {
+                            return false;
+                        }
+                    }
+                    colors[item.Node] = colors[currentNode] * (-1);
+                    Console.WriteLine("Coloring {0} as {1}", item.Node, colors[item.Node]);
+                    RecursiveDFSLogic(item.Node);
+                }
+            }
+            return true;
+        }
+
+        public void CheckBipartite(int startNode)
+        {
+            ResetVisited();
+            for (int i = 0; i < nodeAmount + 1; i++)
+            {
+                colors.Add(0);
+            }
+            colors[startNode] = 1;
+            Console.WriteLine("Is cycle: {0}", CycleCheckLogic(startNode, CheckBipartiteLogic(startNode)));
         }
         #endregion
     }

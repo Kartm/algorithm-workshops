@@ -39,14 +39,14 @@ namespace ConsoleGraphs
             }
         }
 
-        public static Graph LoadFromFile(string path, bool isDirected = false)
+        public static Graph LoadFromFile(string path, bool isDirected)
         {
             string[] graphArray = File.ReadAllLines(path);
 
             int nodeAmount = GetNodeAmount(graphArray);
             int edgeAmount = GetEdgeAmount(graphArray);
             bool isWeighted = CheckIfWeighted(graphArray);
-            Graph temporaryGraph = new Graph(nodeAmount, edgeAmount, isDirected);
+            Graph temporaryGraph = new Graph(nodeAmount, edgeAmount, isDirected, isWeighted);
 
             if(isWeighted)
             {

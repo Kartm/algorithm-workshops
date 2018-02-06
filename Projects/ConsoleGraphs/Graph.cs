@@ -9,28 +9,31 @@ namespace ConsoleGraphs
     {
         public class Connection
         {
-            public int nodeB;
-            public int cost = 0; //*default cost
+            public int Node { get; private set; }
+            public int Cost { get; private set; }
 
             public Connection(int nodeB, int cost = 0)
             {
-                this.nodeB = nodeB;
-                this.cost = cost;
+                Node = nodeB;
+                Cost = cost;
             }
         }
 
         public int NodeAmount { get; private set; }
         public int EdgeAmount { get; private set; }
         public bool IsDirected { get; private set; }
+        public bool IsWeighted { get; private set; }
 
         private List<List<Connection>> GraphList { get; set; }
         
         //todo summary
-        public Graph(int nodeAmount, int edgeAmount, bool isDirected = false)
+        public Graph(int nodeAmount, int edgeAmount, bool isDirected, bool isWeighted)
         {
-            this.NodeAmount = nodeAmount;
-            this.EdgeAmount = edgeAmount;
-            this.IsDirected = isDirected;
+            NodeAmount = nodeAmount;
+            EdgeAmount = edgeAmount;
+            IsDirected = isDirected;
+            IsWeighted = isWeighted;
+
             GraphList = new List<List<Connection>> (nodeAmount + 1);
             for(int i = 0; i < nodeAmount + 1; i++)
             {
@@ -54,29 +57,35 @@ namespace ConsoleGraphs
 
         public bool ConnectionExists(int nodeA, int nodeB)
         {
-            if(GraphList[nodeA].Exists(x => x.nodeB == nodeB) == true)
+            if(GraphList[nodeA].Exists(x => x.Node == nodeB) == true)
             {
                 return true;
             }
             else if(!IsDirected)
             {
-                return GraphList[nodeB].Exists(x => x.nodeB == nodeA);
+                return GraphList[nodeB].Exists(x => x.Node == nodeA);
             }
 
             return false;
         }
 
-        public int GetCost(int nodeA, int nodeB) //todo if unweighted, always return 0
+        public int GetCost(int nodeA, int nodeB) //todo if unweighted, always returns 0
         {
-            if(GraphList[nodeA].Exists(x => x.nodeB == nodeB) == true)
+            if (IsWeighted)
             {
-                return GraphList[nodeA].Where(x => x.nodeB == nodeB).Single().cost;
+                if (GraphList[nodeA].Exists(x => x.Node == nodeB) == true)
+                {
+                    return GraphList[nodeA].Where(x => x.Node == nodeB).Single().Cost;
+                }
+                else if (!IsDirected)
+                {
+                    return GraphList[nodeB].Where(x => x.Node == nodeA).Single().Cost;
+                }
             }
-            else if(!IsDirected)
+            else
             {
-                return GraphList[nodeB].Where(x => x.nodeB == nodeA).Single().cost;
+                return 0;
             }
-
             return 0;
         }
 
@@ -84,6 +93,5 @@ namespace ConsoleGraphs
         {
             return GraphList[node];
         }
-        //contains
     }
 }
