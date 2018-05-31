@@ -4,35 +4,51 @@
 
 using namespace std;
 
+int BinarySearch(vector<long long int> &prefixes, long long int &searchFor, long long int &length)
+{
+    int left = 0;
+    int right = length - 1;
+    while(right >= left)
+    {
+        int middle = (left + right) / 2;
+        if(prefixes[middle] == searchFor)
+        {
+            return middle;
+        }
+        else if(prefixes[middle] > searchFor)
+        {
+            right = middle - 1;
+        }
+        else
+        {
+            left = middle + 1;
+        }
+    }
+    return left;
+}
+
 int main()
 {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-    int fragmentsAmount;
+    long long int fragmentsAmount;
     cin >> fragmentsAmount;
-    vector<int> prefixes (fragmentsAmount);
-    prefixes[0] = 0;
+    vector<long long int> prefixes (fragmentsAmount);
     
-    for(int i = 1; i <= fragmentsAmount; i++)
+    long long int sum = 0;
+    for(int i = 0; i < fragmentsAmount; i++)
     {
-        int input; cin >> input;
-        prefixes[i] = input;
-        prefixes[i] += prefixes[i-1];
+        long long int input; cin >> input;
+        sum += input;
+        prefixes[i] = sum;
     }
 
     int questions;
     cin >> questions;
     for(int i = 0; i < questions; i++)
     {
-        int input; cin >> input;
-        for(int j = 1; j <= fragmentsAmount; j++)
-        {
-            if(input <= prefixes[j])
-            {
-                cout << j << "\n";
-                break;
-            }
-        }
+        long long int input; cin >> input;
+        cout << BinarySearch(prefixes, input, fragmentsAmount) + 1 << "\n";
     }
     
     return 0;
